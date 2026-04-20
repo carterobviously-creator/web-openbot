@@ -1,0 +1,399 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="UTF-8">
+  <title>OpenBot Agent</title>
+  <style>
+    * { box-sizing: border-box; }
+    body {
+      margin: 0;
+      font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+      background: radial-gradient(circle at top, #1b2735 0, #090a0f 55%, #000 100%);
+      color: #e5e5e5;
+      height: 100vh;
+      display: flex;
+      align-items: stretch;
+      justify-content: center;
+    }
+
+    .shell {
+      width: 100%;
+      max-width: 1200px;
+      margin: 20px;
+      border-radius: 18px;
+      background: rgba(10, 10, 15, 0.9);
+      box-shadow: 0 0 40px rgba(0, 0, 0, 0.8);
+      display: grid;
+      grid-template-columns: 2fr 1fr;
+      overflow: hidden;
+      border: 1px solid rgba(120, 200, 255, 0.25);
+      backdrop-filter: blur(18px);
+    }
+
+    .left, .right {
+      padding: 18px 20px;
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+    }
+
+    .left {
+      border-right: 1px solid rgba(255, 255, 255, 0.06);
+    }
+
+    .title-row {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .app-title {
+      font-size: 20px;
+      font-weight: 600;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      color: #9fe8ff;
+    }
+
+    .badge {
+      padding: 4px 10px;
+      border-radius: 999px;
+      font-size: 11px;
+      text-transform: uppercase;
+      letter-spacing: 0.12em;
+      border: 1px solid rgba(159, 232, 255, 0.5);
+      color: #9fe8ff;
+      background: radial-gradient(circle at top left, rgba(159, 232, 255, 0.18), transparent);
+    }
+
+    #chat {
+      flex: 1;
+      overflow-y: auto;
+      border-radius: 12px;
+      border: 1px solid rgba(255, 255, 255, 0.06);
+      padding: 12px;
+      background: radial-gradient(circle at top left, rgba(159, 232, 255, 0.06), rgba(0, 0, 0, 0.9));
+    }
+
+    .msg {
+      margin-bottom: 10px;
+      padding: 8px 10px;
+      border-radius: 8px;
+      max-width: 90%;
+      font-size: 14px;
+      line-height: 1.4;
+    }
+
+    .you {
+      align-self: flex-end;
+      background: linear-gradient(135deg, #1f6feb, #58a6ff);
+      color: #fff;
+    }
+
+    .ai {
+      align-self: flex-start;
+      background: rgba(15, 23, 42, 0.9);
+      border: 1px solid rgba(148, 163, 184, 0.4);
+    }
+
+    .role-label {
+      font-size: 11px;
+      opacity: 0.7;
+      text-transform: uppercase;
+      letter-spacing: 0.12em;
+      margin-bottom: 2px;
+    }
+
+    .input-row {
+      display: flex;
+      gap: 8px;
+      margin-top: 6px;
+    }
+
+    #input {
+      flex: 1;
+      padding: 10px 12px;
+      border-radius: 999px;
+      border: 1px solid rgba(148, 163, 184, 0.6);
+      background: rgba(15, 23, 42, 0.9);
+      color: #e5e5e5;
+      outline: none;
+      font-size: 14px;
+    }
+
+    #input:focus {
+      border-color: #58a6ff;
+      box-shadow: 0 0 0 1px rgba(88, 166, 255, 0.4);
+    }
+
+    .btn {
+      padding: 10px 16px;
+      border-radius: 999px;
+      border: none;
+      font-size: 13px;
+      font-weight: 500;
+      cursor: pointer;
+      text-transform: uppercase;
+      letter-spacing: 0.12em;
+    }
+
+    #send {
+      background: linear-gradient(135deg, #22c55e, #4ade80);
+      color: #041007;
+    }
+
+    #send:hover {
+      filter: brightness(1.1);
+    }
+
+    .right-title {
+      font-size: 14px;
+      text-transform: uppercase;
+      letter-spacing: 0.16em;
+      color: #a5b4fc;
+    }
+
+    .right-sub {
+      font-size: 12px;
+      color: #9ca3af;
+    }
+
+    .agent-card {
+      border-radius: 12px;
+      padding: 12px;
+      background: radial-gradient(circle at top left, rgba(129, 140, 248, 0.18), rgba(15, 23, 42, 0.95));
+      border: 1px solid rgba(129, 140, 248, 0.5);
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+      font-size: 13px;
+    }
+
+    .pill-row {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 6px;
+    }
+
+    .pill {
+      padding: 4px 8px;
+      border-radius: 999px;
+      font-size: 11px;
+      border: 1px solid rgba(148, 163, 184, 0.6);
+      color: #e5e7eb;
+      background: rgba(15, 23, 42, 0.9);
+    }
+
+    .agent-btn {
+      background: linear-gradient(135deg, #ec4899, #a855f7);
+      color: #fff;
+      margin-top: 4px;
+    }
+
+    .agent-btn:hover {
+      filter: brightness(1.1);
+    }
+
+    .tasks {
+      margin-top: 6px;
+      padding-left: 0;
+      list-style: none;
+      font-size: 12px;
+      color: #d1d5db;
+    }
+
+    .tasks li {
+      margin-bottom: 4px;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    .dot {
+      width: 7px;
+      height: 7px;
+      border-radius: 999px;
+      background: #6b7280;
+    }
+
+    .status {
+      font-size: 11px;
+      color: #9ca3af;
+      margin-top: 4px;
+    }
+
+    @media (max-width: 900px) {
+      .shell {
+        grid-template-columns: 1fr;
+      }
+      .left {
+        border-right: none;
+        border-bottom: 1px solid rgba(255, 255, 255, 0.06);
+      }
+    }
+  </style>
+</head>
+<body>
+
+  <div class="shell">
+    <!-- LEFT: Chat -->
+    <div class="left">
+      <div class="title-row">
+        <div class="app-title">OpenBot Agent</div>
+        <div class="badge">Pollinations · Neural Agent</div>
+      </div>
+
+      <div id="chat"></div>
+
+      <div class="input-row">
+        <input id="input" placeholder="Type a message to chat normally...">
+        <button id="send" class="btn">Send</button>
+      </div>
+    </div>
+
+    <!-- RIGHT: Agent panel -->
+    <div class="right">
+      <div class="right-title">Agent Mode</div>
+      <div class="right-sub">
+        Autonomous web‑builder that can research, plan, and generate pro‑grade sites in minutes.
+      </div>
+
+      <div class="agent-card">
+        <div style="font-weight:500; color:#e5e7eb;">Website Builder Agent</div>
+        <div style="font-size:12px; color:#cbd5f5;">
+          Describe the site you want. The agent will:
+        </div>
+
+        <ul class="tasks" id="taskList">
+          <li><span class="dot" data-task="1"></span> Plan structure & sections</li>
+          <li><span class="dot" data-task="2"></span> Research styles (30–2000 refs)</li>
+          <li><span class="dot" data-task="3"></span> Generate HTML/CSS</li>
+          <li><span class="dot" data-task="4"></span> Provide preview link</li>
+        </ul>
+
+        <div class="status" id="agentStatus">
+          Idle · waiting for a website request.
+        </div>
+
+        <div class="pill-row">
+          <div class="pill">Neural nets</div>
+          <div class="pill">Pollinations AI</div>
+          <div class="pill">Sandboxed browser</div>
+          <div class="pill">Task graph</div>
+        </div>
+
+        <button id="agentRun" class="btn agent-btn">
+          Run Website Agent
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    const chat = document.getElementById("chat");
+    const input = document.getElementById("input");
+    const send = document.getElementById("send");
+    const agentRun = document.getElementById("agentRun");
+    const agentStatus = document.getElementById("agentStatus");
+    const taskDots = document.querySelectorAll(".dot");
+
+    function add(role, text) {
+      const div = document.createElement("div");
+      div.className = "msg " + role;
+
+      const label = role === "you" ? "You" : "AI";
+      div.innerHTML = `
+        <div class="role-label">${label}</div>
+        <div>${text.replace(/\n/g, "<br>")}</div>
+      `;
+      chat.appendChild(div);
+      chat.scrollTop = chat.scrollHeight;
+    }
+
+    async function askPollinations(prompt) {
+      const url = "https://text.pollinations.ai/" + encodeURIComponent(prompt);
+      const res = await fetch(url);
+      return res.text();
+    }
+
+    // Normal chat
+    send.onclick = async () => {
+      const msg = input.value.trim();
+      if (!msg) return;
+
+      add("you", msg);
+      input.value = "";
+
+      const reply = await askPollinations(msg);
+      add("ai", reply);
+    };
+
+    input.addEventListener("keydown", (e) => {
+      if (e.key === "Enter") send.click();
+    });
+
+    // Agent: Website builder
+    agentRun.onclick = async () => {
+      const spec = prompt("Describe the website you want (purpose, vibe, sections, colors):");
+      if (!spec) return;
+
+      // Reset task dots
+      taskDots.forEach(d => {
+        d.style.background = "#fbbf24";
+      });
+      agentStatus.textContent = "Running agent · planning, researching, generating...";
+
+      add("you", "[Agent] Build a professional website: " + spec);
+
+      const agentPrompt = `
+You are an autonomous web‑dev agent.
+You:
+- Plan the site structure
+- Research 30–2000 style references conceptually
+- Generate a single, production‑ready HTML document with embedded CSS
+- No explanations, no markdown, no commentary
+- Output ONLY valid HTML (with <html>, <head>, <style>, <body>)
+
+Build a professional website with this spec:
+
+${spec}
+`;
+
+      try {
+        const html = await askPollinations(agentPrompt);
+
+        agentStatus.textContent = "Done · preview link ready.";
+        taskDots.forEach(d => {
+          d.style.background = "#4ade80";
+        });
+
+        add("ai", "[Agent] Website generated. Click the link below to open the preview.");
+
+        // Create preview link
+        const blob = new Blob([html], { type: "text/html" });
+        const url = URL.createObjectURL(blob);
+
+        const link = document.createElement("a");
+        link.href = url;
+        link.download = "preview.html";
+        link.textContent = "Click to open website preview";
+        link.style.color = "#9fe8ff";
+        link.style.display = "block";
+        link.style.marginTop = "10px";
+
+        chat.appendChild(link);
+        chat.scrollTop = chat.scrollHeight;
+
+      } catch (err) {
+        console.error(err);
+        agentStatus.textContent = "Error · could not complete agent run.";
+        add("ai", "[Agent] Something went wrong while generating the site.");
+      }
+    };
+  </script>
+
+</body>
+</html>
+
+
