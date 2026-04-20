@@ -67,13 +67,35 @@
       background: radial-gradient(circle at top left, rgba(159, 232, 255, 0.18), transparent);
     }
 
+    /* ⭐ FIXED SCROLLBAR */
     #chat {
       flex: 1;
-      overflow-y: auto;
+      overflow-y: scroll;
+      overscroll-behavior: contain;
+      scrollbar-width: thin;
       border-radius: 12px;
       border: 1px solid rgba(255, 255, 255, 0.06);
       padding: 12px;
       background: radial-gradient(circle at top left, rgba(159, 232, 255, 0.06), rgba(0, 0, 0, 0.9));
+    }
+
+    #chat::-webkit-scrollbar {
+      width: 12px;
+    }
+
+    #chat::-webkit-scrollbar-track {
+      background: rgba(0, 0, 0, 0.25);
+      border-radius: 10px;
+    }
+
+    #chat::-webkit-scrollbar-thumb {
+      background: rgba(120, 200, 255, 0.45);
+      border-radius: 10px;
+      border: 2px solid rgba(0,0,0,0.4);
+    }
+
+    #chat::-webkit-scrollbar-thumb:hover {
+      background: rgba(120, 200, 255, 0.75);
     }
 
     .msg {
@@ -395,5 +417,3 @@ ${spec}
 
 </body>
 </html>
-
-
